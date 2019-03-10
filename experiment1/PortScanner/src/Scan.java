@@ -20,12 +20,13 @@ public class Scan {
 
     public String beginScan(DefaultTableModel model, JProgressBar progressBar, final int threadsNum){
         cancel = false;
-        progressBar.setMaximum(width);
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(width - 1);
         progressBar.setValue(0);
         Thread[] threads = new Thread[threadsNum];
         Thread monitor;
         monitor = new Thread(()->{
-            while(finished <= width){
+            do{
                 progressBar.setValue(finished);
                 try {
                     Thread.sleep(500);
@@ -35,7 +36,7 @@ public class Scan {
                     finished = 0;
                     return;
                 }
-            }
+            }while(finished < width);
             finished = 0;
         });
         monitor.start();
@@ -97,6 +98,7 @@ public class Scan {
                 }
             }
         }
+        assert monitor.isAlive() == false;
         return "扫描完成。\n";
     }
 
