@@ -18,7 +18,7 @@ public class Scan {
         finished = 0;
     }
 
-    public String beginScan(DefaultTableModel model, JProgressBar progressBar, int threadsNum){
+    public String beginScan(DefaultTableModel model, JProgressBar progressBar, final int threadsNum){
         cancel = false;
         progressBar.setMaximum(width);
         progressBar.setValue(0);
@@ -33,7 +33,6 @@ public class Scan {
                 }
                 if(cancel){
                     finished = 0;
-                    System.out.println("monitor finished");
                     return;
                 }
             }
@@ -51,9 +50,8 @@ public class Scan {
             final int temp = i;
             thread = new Thread(()->{
                 try {
-                    System.out.println("开始创建...");
                     Socket socket = new Socket(addr, temp);
-                    System.out.println("结束创建...");
+                    socket.close();
                 }catch(IOException e){
                     return;
                 }finally {
@@ -71,7 +69,7 @@ public class Scan {
             }else{
                 int insert = -1;
                 do{
-                    for(int j = 0; j < threads.length; j++){
+                    for(int j = 0; j < threadsNum; j++){
                         if(!threads[j].isAlive()){
                             insert = j;
                             break;
@@ -93,7 +91,7 @@ public class Scan {
         boolean notExit = true;
         while(notExit){
             notExit = false;
-            for(int i = 0; i < threads.length; i++) {
+            for(int i = 0; i < Math.min(threadsNum, width); i++) {
                 if(threads[i].isAlive()){
                     notExit = true;
                 }
